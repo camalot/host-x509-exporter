@@ -34,9 +34,9 @@ class X509Metrics:
 			self.expired = Gauge(namespace=self.namespace, name=f"expired", documentation="Indicates if the certificate is currently expired", labelnames=labels)
 			self.host_read_errors = Gauge(namespace=self.namespace, name=f"host_read_errors", documentation="Indicates if there was an error reading the certificate", labelnames=["host"])
 			self.read_errors = Gauge(namespace=self.namespace, name=f"read_errors", documentation="Indicates if there was an error reading the certificate")
+
 	def run_metrics_loop(self):
 		"""Metrics fetching loop"""
-
 		while True:
 			print(f"begin metrics fetch")
 			self.fetch()
