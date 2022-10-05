@@ -31,9 +31,9 @@ class X509Metrics:
 			self.not_valid_after = Gauge(namespace=self.namespace, name=f"cert_not_after", documentation="The timestamp of when the certificate will expire", labelnames=labels)
 			self.not_valid_before = Gauge(namespace=self.namespace, name=f"cert_not_before", documentation="The timestamp of when the certificate was issued", labelnames=labels)
 			# if expired, set to 1, else 0
-			self.expired = Gauge(namespace=self.namespace, name=f"cert_expired", documentation="Indicates if the certificate is currently expired", labelnames=labels)
-			self.host_read_errors = Gauge(namespace=self.namespace, name=f"cert_read_errors", documentation="Indicates if there was an error reading the certificate", labelnames=["host"])
-			self.read_errors = Gauge(namespace=self.namespace, name=f"cert_read_errors", documentation="Indicates if there was an error reading the certificate")
+			self.expired = Gauge(namespace=self.namespace, name=f"expired", documentation="Indicates if the certificate is currently expired", labelnames=labels)
+			self.host_read_errors = Gauge(namespace=self.namespace, name=f"host_read_errors", documentation="Indicates if there was an error reading the certificate", labelnames=["host"])
+			self.read_errors = Gauge(namespace=self.namespace, name=f"read_errors", documentation="Indicates if there was an error reading the certificate")
 	def run_metrics_loop(self):
 		"""Metrics fetching loop"""
 
