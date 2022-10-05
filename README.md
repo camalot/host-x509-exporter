@@ -31,17 +31,17 @@ By default, it will load `/app/config/.configuration.yaml`. To change this, set 
 ```yaml
 metrics:
 	# port to listen on for exporting
-  port: 8932
+	port: 8932
 	# how often to poll the certificates
-  pollingInterval: 43200 # 12 hours
+	pollingInterval: 43200 # 12 hours
 # hosts to check
 hosts:
 - name: server1.home.local
-  port: 443
+	port: 443
 - name: server2.home.local
-  port: 8443
+	port: 8443
 - name: server3.home.local
-  port: 10000
+	port: 10000
 ```
 
 # USAGE
