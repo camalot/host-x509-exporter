@@ -1,4 +1,4 @@
-name: Host-X509-Exporter Publish
+name: Host-X509-Certificate-Exporter Publish
 on:
   push:
     branches:
@@ -35,7 +35,7 @@ jobs:
     - name: Prepare
       id: prep
       run: |
-        GHCR_IMAGE="ghcr.io/camalot/host-x509-exporter";
+        GHCR_IMAGE="ghcr.io/camalot/host-x509-certificate-exporter";
 
         TAGS="${GHCR_IMAGE}:latest,${GHCR_IMAGE}:${{ needs.version.outputs.app_version }}";
         echo ::set-output name=tags::${TAGS}
@@ -59,7 +59,7 @@ jobs:
       with:
         push: true
         build-args: |
-          PROJECT_NAME=host-x509-exporter
+          PROJECT_NAME=host-x509-certificate-exporter
           BUILD_VERSION=${{ needs.version.outputs.app_version }}
         tags: ${{ steps.prep.outputs.tags }}
   merge:

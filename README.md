@@ -1,4 +1,4 @@
-# 🔏 X.509 Certificate Exporter
+# 🔏 X.509 CERTIFICATE EXPORTER
 
 Inspired by [enix/x509-certificate-exporter](https://github.com/enix/x509-certificate-exporter) but added the ability to just hit a host to get the certificate info
 
@@ -11,7 +11,7 @@ Get notified before they expire:
 
 Uses the same dashboard (with tweaks)
 
-![](https://github.com/enix/x509-certificate-exporter/raw/main/docs/grafana-dashboard.jpg)
+![](https://i.imgur.com/UWy29Rr.png)
 
 # METRICS
 
@@ -54,13 +54,13 @@ docker run --rm \
 	-e X509_CONFIG_FILE=/app/config/.configuration.yaml
 	-v /mnt/container_data/host-x509-certificate-exporter/config:/app/config
 	--restart=unless-stopped
-	ghcr.io/camalot/host-x509-exporter:latest
+	ghcr.io/camalot/host-x509-certificate-exporter:latest
 ```
 ### DOCKER COMPOSE
 
 ```yaml
 host-x509-certificate-exporter:
-	image: ghcr.io/camalot/host-x509-exporter:latest
+	image: ghcr.io/camalot/host-x509-certificate-exporter:latest
 	hostname: host-x509-certificate-exporter
 	container_name: host-x509-certificate-exporter
 	restart: unless-stopped
@@ -73,4 +73,40 @@ host-x509-certificate-exporter:
 	deploy: {}
 	environment: 
 		X509_CONFIG_FILE: /app/config/.configuration.yaml
+```
+
+# PROMETHEUS ALERTS
+
+```yaml
+rules:
+- alert: X509ExporterReadErrors
+		annotations:
+			description: Over the last 15 minutes, this host-x509-certificate-exporter instance has experienced errors reading certificate files or querying the Kubernetes API. This could be caused by a misconfiguration if triggered when the exporter starts.
+			summary: Increasing read errors for host-x509-certificate-exporter
+		expr: delta(x509_read_errors[15m]) > 0
+		for: 5m
+		labels:
+			severity: warning
+- alert: CertificateRenewal
+		annotations:
+			description: | 
+				Certificate for "{{ $labels.subject_CN }}" should be renewed
+				{{if $labels.secret_name }}in Kubernets secret "{{ $labels.secret_namespace
+				}}/{{ $labels.secret_name }}"{{else}}at location "{{ $labels.filepath }}"{{end}}
+			summary: Certificate should be renewed
+		expr: ((x509_cert_not_after - time()) / 86400) < 28
+		for: 15m
+		labels:
+			severity: warning
+- alert: CertificateExpiration
+		annotations:
+			description: |
+				Certificate for "{{ $labels.subject_CN }}" is about to expire
+				{{if $labels.secret_name }}in Kubernets secret "{{ $labels.secret_namespace
+				}}/{{ $labels.secret_name }}"{{else}}at location "{{ $labels.filepath }}"{{end}}
+			summary: Certificate is about to expire
+		expr: ((x509_cert_not_after - time()) / 86400) < 14
+		for: 15m
+		labels:
+			severity: critical
 ```
