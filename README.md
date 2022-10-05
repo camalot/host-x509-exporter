@@ -1,15 +1,17 @@
 # 🔏 X.509 CERTIFICATE EXPORTER
 
-Inspired by [enix/x509-certificate-exporter](https://github.com/enix/x509-certificate-exporter) but added the ability to just hit a host to get the certificate info
+Inspired by [enix/x509-certificate-exporter](https://github.com/enix/x509-certificate-exporter) but added the ability to just hit a host to get the certificate info. If you want to export certs from kubernetes or from local files, see the exporter from enix. This is only if you want to get the cert from the host and port. 
+
+This uses all the same metric names. Most of the labels are the same, this just adds a `host` label.
 
 A Prometheus exporter for certificates focusing on expiration monitoring, written in python.
 
 
 Get notified before they expire:
 
-- configure host name and port
+- configure host name and port of the endpoint to test
 
-Uses the same dashboard (with tweaks)
+Uses the same dashboard (with tweaks) 
 
 ![](https://i.imgur.com/UWy29Rr.png)
 
@@ -22,6 +24,7 @@ The following metrics are available:
 - `x509_cert_expired`
 - `x509_read_errors`
 - `x509_host_read_errors`
+- `x509_build_info`
 
 
 # CONFIGURATION

@@ -1,9 +1,7 @@
 from cryptography import x509
 from prometheus_client import start_http_server, Gauge, Enum
-import socket
 import codecs
 import ssl
-import sys
 import pytz
 import yaml
 import os
@@ -27,7 +25,22 @@ class X509Metrics:
 			self.namespace = "x509"
 			self.polling_interval_seconds = config.metrics['pollingInterval']
 			self.config = config
-			labels = ["host", "issuer_C", "issuer_L", "issuer_O", "issuer_OU", "issuer_ST", "issuer_CN", "serial_number", "subject_C", "subject_L", "subject_O", "subject_OU", "subject_CN", "subject_ST"]
+			labels = [
+				"host",
+				"issuer_C",
+				"issuer_L",
+				"issuer_O",
+				"issuer_OU",
+				"issuer_ST",
+				"issuer_CN",
+				"serial_number",
+				"subject_C",
+				"subject_L",
+				"subject_O",
+				"subject_OU",
+				"subject_CN",
+				"subject_ST"
+			]
 			self.not_valid_after = Gauge(namespace=self.namespace, name=f"cert_not_after", documentation="The timestamp of when the certificate will expire", labelnames=labels)
 			self.not_valid_before = Gauge(namespace=self.namespace, name=f"cert_not_before", documentation="The timestamp of when the certificate was issued", labelnames=labels)
 			# if expired, set to 1, else 0
