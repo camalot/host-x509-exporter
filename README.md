@@ -30,18 +30,18 @@ By default, it will load `/app/config/.configuration.yaml`. To change this, set 
 
 ```yaml
 metrics:
-	# port to listen on for exporting
-	port: 8932
-	# how often to poll the certificates
-	pollingInterval: 43200 # 12 hours
+  # port to listen on for exporting
+  port: 8932
+  # how often to poll the certificates
+  pollingInterval: 43200 # 12 hours
 # hosts to check
 hosts:
 - name: server1.home.local
-	port: 443
+  port: 443
 - name: server2.home.local
-	port: 8443
+  port: 8443
 - name: server3.home.local
-	port: 10000
+  port: 10000
 ```
 
 # USAGE
@@ -60,19 +60,16 @@ docker run --rm \
 
 ```yaml
 host-x509-certificate-exporter:
-	image: ghcr.io/camalot/host-x509-certificate-exporter:latest
-	hostname: host-x509-certificate-exporter
-	container_name: host-x509-certificate-exporter
-	restart: unless-stopped
-	ports:
-	- 8932:8932
-	networks:
-	- internal
-	volumes:
-	- /mnt/container_data/host-x509-certificate-exporter/config:/app/config
-	deploy: {}
-	environment: 
-		X509_CONFIG_FILE: /app/config/.configuration.yaml
+  image: ghcr.io/camalot/host-x509-certificate-exporter:latest
+  hostname: host-x509-certificate-exporter
+  container_name: host-x509-certificate-exporter
+  restart: unless-stopped
+  ports:
+  - 8932:8932
+  volumes:
+  - /mnt/container_data/host-x509-certificate-exporter/config:/app/config
+  environment: 
+    X509_CONFIG_FILE: /app/config/.configuration.yaml
 ```
 
 # PROMETHEUS ALERTS
@@ -80,33 +77,33 @@ host-x509-certificate-exporter:
 ```yaml
 rules:
 - alert: X509ExporterReadErrors
-		annotations:
-			description: Over the last 15 minutes, this host-x509-certificate-exporter instance has experienced errors reading certificate files or querying the Kubernetes API. This could be caused by a misconfiguration if triggered when the exporter starts.
-			summary: Increasing read errors for host-x509-certificate-exporter
-		expr: delta(x509_read_errors[15m]) > 0
-		for: 5m
-		labels:
-			severity: warning
+  annotations:
+    description: Over the last 15 minutes, this host-x509-certificate-exporter instance has experienced errors reading certificate files or querying the Kubernetes API. This could be caused by a misconfiguration if triggered when the exporter starts.
+    summary: Increasing read errors for host-x509-certificate-exporter
+  expr: delta(x509_read_errors[15m]) > 0
+  for: 5m
+  labels:
+    severity: warning
 - alert: CertificateRenewal
-		annotations:
-			description: | 
-				Certificate for "{{ $labels.subject_CN }}" should be renewed
-				{{if $labels.secret_name }}in Kubernets secret "{{ $labels.secret_namespace
-				}}/{{ $labels.secret_name }}"{{else}}at location "{{ $labels.filepath }}"{{end}}
-			summary: Certificate should be renewed
-		expr: ((x509_cert_not_after - time()) / 86400) < 28
-		for: 15m
-		labels:
-			severity: warning
+  annotations:
+    description: | 
+      Certificate for "{{ $labels.subject_CN }}" should be renewed
+      {{if $labels.secret_name }}in Kubernets secret "{{ $labels.secret_namespace
+      }}/{{ $labels.secret_name }}"{{else}}at location "{{ $labels.filepath }}"{{end}}
+    summary: Certificate should be renewed
+  expr: ((x509_cert_not_after - time()) / 86400) < 28
+  for: 15m
+  labels:
+    severity: warning
 - alert: CertificateExpiration
-		annotations:
-			description: |
-				Certificate for "{{ $labels.subject_CN }}" is about to expire
-				{{if $labels.secret_name }}in Kubernets secret "{{ $labels.secret_namespace
-				}}/{{ $labels.secret_name }}"{{else}}at location "{{ $labels.filepath }}"{{end}}
-			summary: Certificate is about to expire
-		expr: ((x509_cert_not_after - time()) / 86400) < 14
-		for: 15m
-		labels:
-			severity: critical
+  annotations:
+    description: |
+      Certificate for "{{ $labels.subject_CN }}" is about to expire
+      {{if $labels.secret_name }}in Kubernets secret "{{ $labels.secret_namespace
+      }}/{{ $labels.secret_name }}"{{else}}at location "{{ $labels.filepath }}"{{end}}
+    summary: Certificate is about to expire
+  expr: ((x509_cert_not_after - time()) / 86400) < 14
+  for: 15m
+  labels:
+    severity: critical
 ```

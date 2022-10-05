@@ -27,14 +27,16 @@ class X509Metrics:
 			self.namespace = "x509"
 			self.polling_interval_seconds = config.metrics['pollingInterval']
 			self.config = config
-			labels = ["host", "issuer_C", "issuer_L", "issuer_O", "issuer_OU", "issuer_ST", "serial_number", "subject_C", "subject_L", "subject_O", "subject_OU", "subject_CN"]
+			labels = ["host", "issuer_C", "issuer_L", "issuer_O", "issuer_OU", "issuer_ST", "issuer_CN", "serial_number", "subject_C", "subject_L", "subject_O", "subject_OU", "subject_CN", "subject_ST"]
 			self.not_valid_after = Gauge(namespace=self.namespace, name=f"cert_not_after", documentation="The timestamp of when the certificate will expire", labelnames=labels)
 			self.not_valid_before = Gauge(namespace=self.namespace, name=f"cert_not_before", documentation="The timestamp of when the certificate was issued", labelnames=labels)
 			# if expired, set to 1, else 0
 			self.expired = Gauge(namespace=self.namespace, name=f"expired", documentation="Indicates if the certificate is currently expired", labelnames=labels)
 			self.host_read_errors = Gauge(namespace=self.namespace, name=f"host_read_errors", documentation="Indicates if there was an error reading the certificate", labelnames=["host"])
 			self.read_errors = Gauge(namespace=self.namespace, name=f"read_errors", documentation="Indicates if there was an error reading the certificate")
-
+			self.build_info = Gauge(namespace=self.namespace, name=f"build_info", documentation="A metric with a constant '1' value labeled with version", labelnames=["version"])
+			ver = dict_get(os.environ, "APP_VERSION", "1.0.0-snapshot")
+			self.build_info.labels(version=ver).set(1)
 	def run_metrics_loop(self):
 		"""Metrics fetching loop"""
 		while True:
@@ -42,6 +44,10 @@ class X509Metrics:
 			self.fetch()
 			time.sleep(self.polling_interval_seconds)
 
+	def get_oid_attribute(self, nameObject, oid):
+		if nameObject.get_attributes_for_oid(oid):
+			return nameObject.get_attributes_for_oid(oid)[0].value
+		return None
 
 	def fetch(self):
 		hosts = self.config.hosts
@@ -58,68 +64,22 @@ class X509Metrics:
 				issued_date = x509_cert.not_valid_before.replace(tzinfo=pytz.UTC)
 				serial = x509_cert.serial_number
 				issuer = x509_cert.issuer
+				subject = x509_cert.subject
 				# set prometheus metric
-				# if has Country_Name (C) attribute
-				issuer_C = ""
-				if issuer.get_attributes_for_oid(x509.oid.NameOID.COUNTRY_NAME):
-					# set issuer_C
-					issuer_C = issuer.get_attributes_for_oid(x509.oid.NameOID.COUNTRY_NAME)[0].value
-				# if has Locality_Name (L) attribute
-				issuer_L = ""
-				if issuer.get_attributes_for_oid(x509.oid.NameOID.LOCALITY_NAME):
-					# set issuer_L
-					issuer_L = issuer.get_attributes_for_oid(x509.oid.NameOID.LOCALITY_NAME)[0].value
-				# if has Organization_Name (O) attribute
-				issuer_O = ""
-				if issuer.get_attributes_for_oid(x509.oid.NameOID.ORGANIZATION_NAME):
-					# set issuer_O
-					issuer_O = issuer.get_attributes_for_oid(x509.oid.NameOID.ORGANIZATION_NAME)[0].value
-				# if has Organizational_Unit_Name (OU) attribute
-				issuer_OU = ""
-				if issuer.get_attributes_for_oid(x509.oid.NameOID.ORGANIZATIONAL_UNIT_NAME):
-					# set issuer_OU
-					issuer_OU = issuer.get_attributes_for_oid(x509.oid.NameOID.ORGANIZATIONAL_UNIT_NAME)[0].value
-				# if has State_or_Province_Name (ST) attribute
-				issuer_ST = ""
-				if issuer.get_attributes_for_oid(x509.oid.NameOID.STATE_OR_PROVINCE_NAME):
-					# set issuer_ST
-					issuer_ST = issuer.get_attributes_for_oid(x509.oid.NameOID.STATE_OR_PROVINCE_NAME)[0].value
-				# if has Common_Name (CN) attribute
-				issuer_CN = ""
-				if issuer.get_attributes_for_oid(x509.oid.NameOID.COMMON_NAME):
-					# set issuer_CN
-					issuer_CN = issuer.get_attributes_for_oid(x509.oid.NameOID.COMMON_NAME)[0].value
-				# if has Country_Name (C) attribute for subject
-				subject_C = ""
-				if x509_cert.subject.get_attributes_for_oid(x509.oid.NameOID.COUNTRY_NAME):
-					# set subject_C
-					subject_C = x509_cert.subject.get_attributes_for_oid(x509.oid.NameOID.COUNTRY_NAME)[0].value
-				# if has Locality_Name (L) attribute for subject
-				subject_L = ""
-				if x509_cert.subject.get_attributes_for_oid(x509.oid.NameOID.LOCALITY_NAME):
-					# set subject_L
-					subject_L = x509_cert.subject.get_attributes_for_oid(x509.oid.NameOID.LOCALITY_NAME)[0].value
-				# if has Organization_Name (O) attribute for subject
-				subject_O = ""
-				if x509_cert.subject.get_attributes_for_oid(x509.oid.NameOID.ORGANIZATION_NAME):
-					# set subject_O
-					subject_O = x509_cert.subject.get_attributes_for_oid(x509.oid.NameOID.ORGANIZATION_NAME)[0].value
-				# if has Organizational_Unit_Name (OU) attribute for subject
-				subject_OU = ""
-				if x509_cert.subject.get_attributes_for_oid(x509.oid.NameOID.ORGANIZATIONAL_UNIT_NAME):
-					# set subject_OU
-					subject_OU = x509_cert.subject.get_attributes_for_oid(x509.oid.NameOID.ORGANIZATIONAL_UNIT_NAME)[0].value
-				# if has State_or_Province_Name (ST) attribute for subject
-				subject_ST = ""
-				if x509_cert.subject.get_attributes_for_oid(x509.oid.NameOID.STATE_OR_PROVINCE_NAME):
-					# set subject_ST
-					subject_ST = x509_cert.subject.get_attributes_for_oid(x509.oid.NameOID.STATE_OR_PROVINCE_NAME)[0].value
-				# if has Common_Name (CN) attribute for subject
-				subject_CN = ""
-				if x509_cert.subject.get_attributes_for_oid(x509.oid.NameOID.COMMON_NAME):
-					# set subject_CN
-					subject_CN = x509_cert.subject.get_attributes_for_oid(x509.oid.NameOID.COMMON_NAME)[0].value
-				# set prometheus metric
+				issuer_C = self.get_oid_attribute(issuer, x509.oid.NameOID.COUNTRY_NAME)
+				issuer_L = self.get_oid_attribute(issuer, x509.oid.NameOID.LOCALITY_NAME)
+				issuer_O = self.get_oid_attribute(issuer, x509.oid.NameOID.ORGANIZATION_NAME)
+				issuer_OU = self.get_oid_attribute(issuer, x509.oid.NameOID.ORGANIZATIONAL_UNIT_NAME)
+				issuer_ST = self.get_oid_attribute(issuer, x509.oid.NameOID.STATE_OR_PROVINCE_NAME)
+				issuer_CN = self.get_oid_attribute(issuer, x509.oid.NameOID.COMMON_NAME)
+
+				subject_C = self.get_oid_attribute(subject, x509.oid.NameOID.COUNTRY_NAME)
+				subject_L = self.get_oid_attribute(subject, x509.oid.NameOID.LOCALITY_NAME)
+				subject_O = self.get_oid_attribute(subject, x509.oid.NameOID.ORGANIZATION_NAME)
+				subject_OU = self.get_oid_attribute(subject, x509.oid.NameOID.ORGANIZATIONAL_UNIT_NAME)
+				subject_ST = self.get_oid_attribute(subject, x509.oid.NameOID.STATE_OR_PROVINCE_NAME)
+				subject_CN = self.get_oid_attribute(subject, x509.oid.NameOID.COMMON_NAME)
+
 				self.not_valid_after.labels(
 					host=f"{host['name']}:{host['port']}",
 					issuer_C=issuer_C,
@@ -127,9 +87,11 @@ class X509Metrics:
 					issuer_O=issuer_O,
 					issuer_OU=issuer_OU,
 					issuer_ST=issuer_ST,
+					issuer_CN=issuer_CN,
 					serial_number=serial,
 					subject_C=subject_C,
 					subject_L=subject_L,
+					subject_ST=subject_ST,
 					subject_O=subject_O,
 					subject_OU=subject_OU,
 					subject_CN=subject_CN,
@@ -142,9 +104,11 @@ class X509Metrics:
 					issuer_O=issuer_O,
 					issuer_OU=issuer_OU,
 					issuer_ST=issuer_ST,
+					issuer_CN=issuer_CN,
 					serial_number=serial,
 					subject_C=subject_C,
 					subject_L=subject_L,
+					subject_ST=subject_ST,
 					subject_O=subject_O,
 					subject_OU=subject_OU,
 					subject_CN=subject_CN,
@@ -157,9 +121,11 @@ class X509Metrics:
 					issuer_O=issuer_O,
 					issuer_OU=issuer_OU,
 					issuer_ST=issuer_ST,
+					issuer_CN=issuer_CN,
 					serial_number=serial,
 					subject_C=subject_C,
 					subject_L=subject_L,
+					subject_ST=subject_ST,
 					subject_O=subject_O,
 					subject_OU=subject_OU,
 					subject_CN=subject_CN,
