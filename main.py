@@ -27,12 +27,11 @@ class X509Metrics:
 			self.namespace = "x509"
 			self.polling_interval_seconds = config.metrics['pollingInterval']
 			self.config = config
-			self.not_valid_after = Gauge(namespace=self.namespace, name=f"cert_not_valid_after", documentation="", labelnames=["host", "issuer_C", "issuer_L", "issuer_O", "issuer_OU", "issuer_ST", "serial_number", "subject_C", "subject_L", "subject_O", "subject_OU", "subject_CN"])
-			self.not_valid_before = Gauge(namespace=self.namespace, name=f"cert_not_valid_before", documentation="", labelnames=["host", "issuer_C", "issuer_L", "issuer_O", "issuer_OU", "issuer_ST", "serial_number", "subject_C", "subject_L", "subject_O", "subject_OU", "subject_CN"])
+			labels = ["host", "issuer_C", "issuer_L", "issuer_O", "issuer_OU", "issuer_ST", "serial_number", "subject_C", "subject_L", "subject_O", "subject_OU", "subject_CN"]
+			self.not_valid_after = Gauge(namespace=self.namespace, name=f"cert_not_valid_after", documentation="The timestamp of when the certificate will expire", labelnames=labels)
+			self.not_valid_before = Gauge(namespace=self.namespace, name=f"cert_not_valid_before", documentation="The timestamp of when the certificate was issued", labelnames=labels)
 			# if expired, set to 1, else 0
-			self.expired = Gauge(namespace=self.namespace, name=f"cert_expired", documentation="", labelnames=["host", "issuer_C", "issuer_L", "issuer_O", "issuer_OU", "issuer_ST", "serial_number", "subject_C", "subject_L", "subject_O", "subject_OU", "subject_CN"])
-#			self.expired = (namespace=self.namespace, name=f"cert_expired", documentation="", states=["true", "false"], labelnames=["host", "issuer_C", "issuer_L", "issuer_O", "issuer_OU", "issuer_ST", "serial_number", "subject_C", "subject_L", "subject_O", "subject_OU", "subject_CN"])
-			# issuer_C="US", issuer_L="Justice", issuer_O="Bit13", issuer_OU="Home", serial_number="591276174562545155417539340634231254884272916133", subject_C="US", subject_L="Justice", subject_O="Bit13", subject_OU="Home"
+			self.expired = Gauge(namespace=self.namespace, name=f"cert_expired", documentation="Indicates if the certificate is currently expired", labelnames=labels)
 	def run_metrics_loop(self):
 		"""Metrics fetching loop"""
 
@@ -169,7 +168,7 @@ def dict_get(dictionary, key, default_value = None):
 		return default_value
 
 def main():
-	config_file = dict_get(os.environ, "X509_CONFIG_FILE", default_value="./.configuration.yaml")
+	config_file = dict_get(os.environ, "X509_CONFIG_FILE", default_value="./config/.configuration.yaml")
 
 	config = AppConfig(config_file)
 
