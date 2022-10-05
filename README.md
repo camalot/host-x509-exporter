@@ -54,7 +54,7 @@ docker run --rm \
 	-e X509_CONFIG_FILE=/app/config/.configuration.yaml
 	-v /mnt/container_data/host-x509-certificate-exporter/config:/app/config
 	--restart=unless-stopped
-	ghcr.io/camalot/host-x509-exporter:latest
+	ghcr.io/camalot/host-x509-certificate-exporter:latest
 ```
 ### DOCKER COMPOSE
 
