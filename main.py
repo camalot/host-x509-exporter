@@ -28,8 +28,8 @@ class X509Metrics:
 			self.polling_interval_seconds = config.metrics['pollingInterval']
 			self.config = config
 			labels = ["host", "issuer_C", "issuer_L", "issuer_O", "issuer_OU", "issuer_ST", "serial_number", "subject_C", "subject_L", "subject_O", "subject_OU", "subject_CN"]
-			self.not_valid_after = Gauge(namespace=self.namespace, name=f"cert_not_valid_after", documentation="The timestamp of when the certificate will expire", labelnames=labels)
-			self.not_valid_before = Gauge(namespace=self.namespace, name=f"cert_not_valid_before", documentation="The timestamp of when the certificate was issued", labelnames=labels)
+			self.not_valid_after = Gauge(namespace=self.namespace, name=f"cert_not_after", documentation="The timestamp of when the certificate will expire", labelnames=labels)
+			self.not_valid_before = Gauge(namespace=self.namespace, name=f"cert_not_before", documentation="The timestamp of when the certificate was issued", labelnames=labels)
 			# if expired, set to 1, else 0
 			self.expired = Gauge(namespace=self.namespace, name=f"cert_expired", documentation="Indicates if the certificate is currently expired", labelnames=labels)
 	def run_metrics_loop(self):
