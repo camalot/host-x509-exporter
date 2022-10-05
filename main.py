@@ -32,7 +32,8 @@ class X509Metrics:
 			self.not_valid_before = Gauge(namespace=self.namespace, name=f"cert_not_before", documentation="The timestamp of when the certificate was issued", labelnames=labels)
 			# if expired, set to 1, else 0
 			self.expired = Gauge(namespace=self.namespace, name=f"cert_expired", documentation="Indicates if the certificate is currently expired", labelnames=labels)
-			self.read_errors = Gauge(namespace=self.namespace, name=f"cert_read_errors", documentation="Indicates if there was an error reading the certificate", labelnames=["host"])
+			self.host_read_errors = Gauge(namespace=self.namespace, name=f"cert_read_errors", documentation="Indicates if there was an error reading the certificate", labelnames=["host"])
+			self.read_errors = Gauge(namespace=self.namespace, name=f"cert_read_errors", documentation="Indicates if there was an error reading the certificate")
 	def run_metrics_loop(self):
 		"""Metrics fetching loop"""
 
@@ -44,6 +45,7 @@ class X509Metrics:
 
 	def fetch(self):
 		hosts = self.config.hosts
+		error_count = 0
 		# loop hosts
 		for host in hosts:
 			try:
@@ -163,7 +165,12 @@ class X509Metrics:
 					subject_CN=subject_CN,
 				).set(1 if expiration_date < datetime.datetime.now().replace(tzinfo=pytz.UTC) else 0)
 			except Exception as e:
-				self.read_errors.labels(host=f"{host['name']}:{host['port']}").set(1)
+				error_count += 1
+				self.host_read_errors.labels(host=f"{host['name']}:{host['port']}").set(1)
+			if error_count == 0:
+				self.host_read_errors.labels(host=f"{host['name']}:{host['port']}").set(0)
+
+		self.read_errors.set(error_count)
 def dict_get(dictionary, key, default_value = None):
 	if key in dictionary.keys():
 		return dictionary[key] or default_value
