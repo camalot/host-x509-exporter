@@ -1,0 +1,10 @@
+metrics:
+  port: 8932
+  pollingInterval: 43200 # in seconds
+hosts:
+- name: host1.internal
+  port: 443
+- name: host2.internal
+  port: 443
+- name: host3.internal
+  port: 443
