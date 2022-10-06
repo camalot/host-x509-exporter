@@ -47,6 +47,15 @@ hosts:
   port: 10000
 ```
 
+## ENVIRONMENT VARIABLES
+
+You can set all the configuration via environment variables, if needed.
+
+- `X509_CONFIG_FILE`: Path to the config file to load
+- `X509_CONFIG_METRICS_PORT`: port to listen on for exporting
+- `X509_CONFIG_METRICS_POLLING_INTERVAL`: how often to poll the certificates
+- `X509_CONFIG_HOST_<NUMBER>`: Host and port to check. `X509_CONFIG_HOST_1=server1.home.local:443`
+
 # USAGE
 
 ### DOCKER
