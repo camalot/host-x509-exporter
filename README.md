@@ -29,6 +29,8 @@ The following metrics are available:
 
 # CONFIGURATION
 
+## CONFIG FILE
+
 By default, it will load `/app/config/.configuration.yaml`. To change this, set the `X509_CONFIG_FILE` environment variable.
 
 ```yaml
@@ -58,7 +60,7 @@ You can set all the configuration via environment variables, if needed.
 
 # USAGE
 
-### DOCKER
+## DOCKER
 
 ```
 docker run --rm \
@@ -72,7 +74,7 @@ docker run --rm \
 	--restart=unless-stopped \
 	ghcr.io/camalot/host-x509-certificate-exporter:latest
 ```
-### DOCKER COMPOSE
+## DOCKER COMPOSE
 
 ```yaml
 version: '3.7'
