@@ -77,9 +77,12 @@ class X509Metrics:
 			self.expired = Gauge(namespace=self.namespace, name=f"expired", documentation="Indicates if the certificate is currently expired", labelnames=labels)
 			self.host_read_errors = Gauge(namespace=self.namespace, name=f"host_read_errors", documentation="Indicates if there was an error reading the certificate", labelnames=["host"])
 			self.read_errors = Gauge(namespace=self.namespace, name=f"read_errors", documentation="Indicates if there was an error reading the certificate")
-			self.build_info = Gauge(namespace=self.namespace, name=f"build_info", documentation="A metric with a constant '1' value labeled with version", labelnames=["version"])
+			self.build_info = Gauge(namespace=self.namespace, name=f"build_info", documentation="A metric with a constant '1' value labeled with version", labelnames=["version", "ref", "build_date", "sha"])
 			ver = dict_get(os.environ, "APP_VERSION", "1.0.0-snapshot")
-			self.build_info.labels(version=ver).set(1)
+			ref = dict_get(os.environ, "APP_BUILD_REF", "unknown")
+			build_date = dict_get(os.environ, "APP_BUILD_DATE", "unknown")
+			sha = dict_get(os.environ, "APP_BUILD_SHA", "unknown")
+			self.build_info.labels(version=ver, ref=ref, build_date=build_date, sha=sha).set(1)
 	def run_metrics_loop(self):
 		"""Metrics fetching loop"""
 		while True:
