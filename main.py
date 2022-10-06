@@ -4,6 +4,7 @@ import codecs
 import ssl
 import pytz
 import yaml
+import re
 import os
 import time
 from dotenv import load_dotenv, find_dotenv
@@ -13,12 +14,41 @@ load_dotenv(find_dotenv())
 
 class AppConfig():
 	def __init__(self, file: str):
+		# set defaults for config from environment variables if they exist
+		self.metrics = {
+			"port": int(dict_get(os.environ, "X509_CONFIG_METRICS_PORT", "8932")),
+			"pollingInterval": int(dict_get(os.environ, "X509_CONFIG_METRICS_POLLING_INTERVAL", "43200"))
+		}
 		try:
-			with codecs.open(file, encoding="utf-8-sig", mode="r") as f:
-				settings = yaml.safe_load(f)
-				self.__dict__.update(settings)
+			# check if file exists
+			if os.path.exists(file):
+				print(f"Loading config from {file}")
+				with codecs.open(file, encoding="utf-8-sig", mode="r") as f:
+					settings = yaml.safe_load(f)
+					self.__dict__.update(settings)
 		except yaml.YAMLError as exc:
 			print(exc)
+		env_hosts = self.find_hosts_from_envrionment()
+		if len(env_hosts) > 0:
+			# merge env_hosts with config file
+			self.hosts = self.hosts + env_hosts
+			print(f"Appended {len(env_hosts)} hosts from environment variables")
+
+	def find_hosts_from_envrionment(self):
+		hosts = []
+		for env in os.environ:
+			if re.match(r"^X509_CONFIG_HOST_\d{1,}$", env, re.IGNORECASE | re.DOTALL):
+				print(f"Found Host from Environment Variable: {env}")
+				# split value by :
+				values = os.environ[env].split(":")
+				# check if we have 2 values
+				if len(values) == 2:
+					# add to hosts
+					hosts.append({
+						"name": values[0],
+						"port": values[1]
+					})
+		return hosts
 
 class X509Metrics:
 	def __init__(self, config):

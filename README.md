@@ -47,32 +47,52 @@ hosts:
   port: 10000
 ```
 
+## ENVIRONMENT VARIABLES
+
+You can set all the configuration via environment variables, if needed.
+
+- `X509_CONFIG_FILE`: Path to the config file to load
+- `X509_CONFIG_METRICS_PORT`: port to listen on for exporting
+- `X509_CONFIG_METRICS_POLLING_INTERVAL`: how often to poll the certificates
+- `X509_CONFIG_HOST_<NUMBER>`: Host and port to check. `X509_CONFIG_HOST_1=server1.home.local:443`
+
 # USAGE
 
 ### DOCKER
 
 ```
 docker run --rm \
-	-p 8932:8932
-	-e X509_CONFIG_FILE=/app/config/.configuration.yaml
-	-v /mnt/container_data/host-x509-certificate-exporter/config:/app/config
-	--restart=unless-stopped
+	-p 8932:8932 \
+	-e X509_CONFIG_FILE=/app/config/.configuration.yaml \
+	-e X509_CONFIG_METRICS_PORT=8932 \
+	-e X509_CONFIG_METRICS_POLLING_INTERVAL=43200 \
+	-e X509_CONFIG_HOST_1=host1.home.local:443 \
+	-e X509_CONFIG_HOST_2=host2.home.local:443 \
+	-v /mnt/container_data/host-x509-certificate-exporter/config:/app/config \
+	--restart=unless-stopped \
 	ghcr.io/camalot/host-x509-certificate-exporter:latest
 ```
 ### DOCKER COMPOSE
 
 ```yaml
-host-x509-certificate-exporter:
-  image: ghcr.io/camalot/host-x509-certificate-exporter:latest
-  hostname: host-x509-certificate-exporter
-  container_name: host-x509-certificate-exporter
-  restart: unless-stopped
-  ports:
-  - 8932:8932
-  volumes:
-  - /mnt/container_data/host-x509-certificate-exporter/config:/app/config
-  environment: 
-    X509_CONFIG_FILE: /app/config/.configuration.yaml
+version: '3.7'
+services:
+  host-x509-certificate-exporter:
+    image: ghcr.io/camalot/host-x509-certificate-exporter:latest
+    hostname: host-x509-certificate-exporter
+    container_name: host-x509-certificate-exporter
+    restart: unless-stopped
+    network_mode: bridge
+    ports:
+    - 8932:8932
+    volumes:
+    - /path/to/config:/app/config
+    environment:
+      X509_CONFIG_FILE: /app/config/.configuration.yaml
+      X509_CONFIG_METRICS_PORT: "8932"
+      X509_CONFIG_METRICS_POLLING_INTERVAL: "43200"
+      X509_CONFIG_HOST_1: host1.home.local:443
+      X509_CONFIG_HOST_2: host2.home.local:443
 ```
 
 # PROMETHEUS ALERTS
