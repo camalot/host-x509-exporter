@@ -4,3 +4,5 @@
 Dockerfile
 config/
 docker-compose.yml
+grafana/
+.github/

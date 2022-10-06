@@ -1,0 +1,2271 @@
+{
+	"annotations": {
+		"list": [
+			{
+				"builtIn": 1,
+				"datasource": {
+					"type": "datasource",
+					"uid": "grafana"
+				},
+				"enable": true,
+				"hide": true,
+				"iconColor": "rgba(0, 211, 255, 1)",
+				"name": "Annotations & Alerts",
+				"target": {
+					"limit": 100,
+					"matchAny": false,
+					"tags": [],
+					"type": "dashboard"
+				},
+				"type": "dashboard"
+			}
+		]
+	},
+	"description": "Unified dashboard for checking certificates expiration: Kubernetes Secrets, certificate files on nodes, or on any server.",
+	"editable": true,
+	"fiscalYearStartMonth": 0,
+	"gnetId": 13922,
+	"graphTooltip": 0,
+	"id": 16,
+	"links": [],
+	"liveNow": false,
+	"panels": [
+		{
+			"collapsed": false,
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"gridPos": {
+				"h": 1,
+				"w": 24,
+				"x": 0,
+				"y": 0
+			},
+			"id": 24,
+			"panels": [],
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"refId": "A"
+				}
+			],
+			"title": "Overview",
+			"type": "row"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							}
+						]
+					},
+					"unit": "none"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 6,
+				"w": 5,
+				"x": 0,
+				"y": 1
+			},
+			"id": 2,
+			"options": {
+				"colorMode": "value",
+				"graphMode": "area",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": [
+						"lastNotNull"
+					],
+					"fields": "",
+					"values": false
+				},
+				"text": {},
+				"textMode": "value"
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"editorMode": "code",
+					"expr": "count(x509_cert_not_after)",
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"range": true,
+					"refId": "A"
+				}
+			],
+			"title": "Total Certificates",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 1
+							}
+						]
+					},
+					"unit": "short"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 6,
+				"w": 3,
+				"x": 5,
+				"y": 1
+			},
+			"id": 18,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "none",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": [
+						"lastNotNull"
+					],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"editorMode": "code",
+					"exemplar": false,
+					"expr": "sum(((x509_cert_not_after - time()) / 86400) < bool 0)",
+					"instant": true,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"range": false,
+					"refId": "A"
+				}
+			],
+			"title": "Expired",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 1
+							}
+						]
+					},
+					"unit": "short"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 6,
+				"w": 3,
+				"x": 8,
+				"y": 1
+			},
+			"id": 19,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "none",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": [
+						"lastNotNull"
+					],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"editorMode": "code",
+					"exemplar": false,
+					"expr": "sum(0 < ((x509_cert_not_after - time()) / 86400) < bool $critical_threshold)",
+					"instant": true,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"range": false,
+					"refId": "A"
+				}
+			],
+			"title": "Expiring within $critical_threshold days",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 1
+							}
+						]
+					},
+					"unit": "short"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 6,
+				"w": 3,
+				"x": 11,
+				"y": 1
+			},
+			"id": 20,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "none",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": [
+						"lastNotNull"
+					],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"editorMode": "code",
+					"expr": "sum(0 < ((x509_cert_not_after - time()) / 86400) < bool $warning_threshold)",
+					"instant": false,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Expiring within $warning_threshold days",
+			"type": "stat"
+		},
+		{
+			"aliasColors": {},
+			"breakPoint": "50%",
+			"combine": {
+				"label": "Others",
+				"threshold": 0
+			},
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fontSize": "80%",
+			"format": "short",
+			"gridPos": {
+				"h": 6,
+				"w": 4,
+				"x": 14,
+				"y": 1
+			},
+			"id": 8,
+			"legend": {
+				"header": "",
+				"percentage": true,
+				"show": true,
+				"values": true
+			},
+			"legendType": "Right side",
+			"links": [],
+			"nullPointMode": "connected",
+			"pieType": "pie",
+			"pluginVersion": "7.4.1",
+			"strokeWidth": "2",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"expr": "count(x509_cert_not_after{secret_name!=\"\"})",
+					"instant": true,
+					"interval": "",
+					"legendFormat": "Kubernetes Secret",
+					"queryType": "randomWalk",
+					"refId": "A"
+				},
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"expr": "count(x509_cert_not_after{filepath!=\"\",embedded_key!=\"\"})",
+					"hide": false,
+					"instant": true,
+					"interval": "",
+					"legendFormat": "Kubeconfig Embedded",
+					"refId": "B"
+				},
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"expr": "count(x509_cert_not_after{filepath!=\"\",embedded_key=\"\"})",
+					"hide": false,
+					"instant": true,
+					"interval": "",
+					"legendFormat": "Certificate File",
+					"refId": "C"
+				},
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"editorMode": "code",
+					"expr": "count(x509_cert_not_after{host!=\"\"})",
+					"hide": false,
+					"interval": "",
+					"legendFormat": "Certificate Host",
+					"range": true,
+					"refId": "D"
+				}
+			],
+			"title": "Sources",
+			"type": "grafana-piechart-panel",
+			"valueName": "current"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "red",
+								"value": null
+							},
+							{
+								"color": "green",
+								"value": 1
+							}
+						]
+					},
+					"unit": "short"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 6,
+				"w": 3,
+				"x": 18,
+				"y": 1
+			},
+			"id": 17,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "none",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": [
+						"lastNotNull"
+					],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"editorMode": "code",
+					"expr": "count(x509_read_errors)",
+					"instant": false,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Exporters",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 1
+							}
+						]
+					},
+					"unit": "short"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 6,
+				"w": 3,
+				"x": 21,
+				"y": 1
+			},
+			"id": 36,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "none",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": [
+						"lastNotNull"
+					],
+					"fields": "",
+					"values": false
+				},
+				"textMode": "auto"
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"editorMode": "code",
+					"exemplar": false,
+					"expr": "sum(x509_read_errors)",
+					"instant": true,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"range": false,
+					"refId": "A"
+				}
+			],
+			"title": "Exporter Errors",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"axisCenteredZero": false,
+						"axisColorMode": "series",
+						"axisGridShow": true,
+						"axisLabel": "",
+						"axisPlacement": "auto",
+						"axisSoftMax": 10,
+						"axisSoftMin": 0,
+						"barAlignment": 0,
+						"drawStyle": "line",
+						"fillOpacity": 61,
+						"gradientMode": "none",
+						"hideFrom": {
+							"legend": false,
+							"tooltip": false,
+							"viz": false
+						},
+						"lineInterpolation": "linear",
+						"lineWidth": 2,
+						"pointSize": 5,
+						"scaleDistribution": {
+							"type": "linear"
+						},
+						"showPoints": "auto",
+						"spanNulls": false,
+						"stacking": {
+							"group": "A",
+							"mode": "none"
+						},
+						"thresholdsStyle": {
+							"mode": "off"
+						}
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 1
+							}
+						]
+					}
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 7,
+				"w": 24,
+				"x": 0,
+				"y": 7
+			},
+			"id": 49,
+			"options": {
+				"legend": {
+					"calcs": [],
+					"displayMode": "list",
+					"placement": "right",
+					"showLegend": true
+				},
+				"tooltip": {
+					"mode": "single",
+					"sort": "none"
+				}
+			},
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"editorMode": "code",
+					"expr": "x509_host_read_errors",
+					"legendFormat": "{{host}}",
+					"range": true,
+					"refId": "A"
+				}
+			],
+			"title": "Errors By Host",
+			"transformations": [],
+			"type": "timeseries"
+		},
+		{
+			"collapsed": false,
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"gridPos": {
+				"h": 1,
+				"w": 24,
+				"x": 0,
+				"y": 14
+			},
+			"id": 26,
+			"panels": [],
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"refId": "A"
+				}
+			],
+			"title": "Expiration",
+			"type": "row"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"description": "",
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"custom": {
+						"align": "auto",
+						"displayMode": "auto",
+						"filterable": true,
+						"inspect": false
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "red",
+								"value": null
+							}
+						]
+					}
+				},
+				"overrides": [
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Time Left"
+						},
+						"properties": [
+							{
+								"id": "custom.align",
+								"value": "center"
+							},
+							{
+								"id": "custom.width",
+								"value": 200
+							},
+							{
+								"id": "custom.filterable",
+								"value": false
+							},
+							{
+								"id": "custom.displayMode",
+								"value": "color-background"
+							},
+							{
+								"id": "thresholds",
+								"value": {
+									"mode": "absolute",
+									"steps": [
+										{
+											"color": "dark-red",
+											"value": null
+										},
+										{
+											"color": "red",
+											"value": 0
+										},
+										{
+											"color": "#EAB839",
+											"value": 14
+										},
+										{
+											"color": "green",
+											"value": 60
+										}
+									]
+								}
+							},
+							{
+								"id": "unit",
+								"value": "d"
+							}
+						]
+					}
+				]
+			},
+			"gridPos": {
+				"h": 12,
+				"w": 24,
+				"x": 0,
+				"y": 15
+			},
+			"id": 47,
+			"options": {
+				"footer": {
+					"fields": "",
+					"reducer": [
+						"sum"
+					],
+					"show": false
+				},
+				"showHeader": true,
+				"sortBy": [
+					{
+						"desc": false,
+						"displayName": "Host"
+					}
+				]
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"editorMode": "code",
+					"exemplar": false,
+					"expr": "sort(((x509_cert_not_after - time()) / 86400) < $list_threshold)",
+					"format": "table",
+					"instant": true,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Host Files ($list_threshold Days)",
+			"transformations": [
+				{
+					"id": "filterFieldsByName",
+					"options": {
+						"include": {
+							"pattern": "^(subject_CN|instance|filepath|Value|host)$"
+						}
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": {},
+						"indexByName": {
+							"Value": 4,
+							"filepath": 3,
+							"host": 2,
+							"instance": 1,
+							"subject_CN": 0
+						},
+						"renameByName": {
+							"Value": "Time Left",
+							"filepath": "File Path",
+							"host": "Host",
+							"instance": "Instance",
+							"subject_CN": "Subject CN"
+						}
+					}
+				}
+			],
+			"type": "table"
+		},
+		{
+			"collapsed": false,
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"gridPos": {
+				"h": 1,
+				"w": 24,
+				"x": 0,
+				"y": 27
+			},
+			"id": 12,
+			"panels": [],
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"refId": "A"
+				}
+			],
+			"title": "Charts",
+			"type": "row"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"custom": {
+						"align": "auto",
+						"displayMode": "auto",
+						"filterable": false,
+						"inspect": false
+					},
+					"mappings": [],
+					"noValue": "N/A",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					}
+				},
+				"overrides": [
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Days"
+						},
+						"properties": [
+							{
+								"id": "custom.align",
+								"value": "center"
+							},
+							{
+								"id": "custom.width",
+								"value": 100
+							}
+						]
+					}
+				]
+			},
+			"gridPos": {
+				"h": 12,
+				"w": 12,
+				"x": 0,
+				"y": 28
+			},
+			"id": 33,
+			"options": {
+				"footer": {
+					"fields": "",
+					"reducer": [
+						"sum"
+					],
+					"show": false
+				},
+				"showHeader": true
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"editorMode": "code",
+					"expr": "bottomk(10, (x509_cert_not_after - x509_cert_not_before) / 86400)",
+					"format": "table",
+					"instant": true,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Host Paths : Shortest Validity Period",
+			"transformations": [
+				{
+					"id": "filterFieldsByName",
+					"options": {
+						"include": {
+							"names": [
+								"filepath",
+								"instance",
+								"subject_CN",
+								"Value",
+								"host"
+							],
+							"pattern": "^(subject_CN|instance|filepath|Value)$"
+						}
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": {},
+						"indexByName": {
+							"Value": 4,
+							"filepath": 3,
+							"host": 2,
+							"instance": 1,
+							"subject_CN": 0
+						},
+						"renameByName": {
+							"Value": "Days",
+							"filepath": "File Path",
+							"host": "Host",
+							"instance": "Instance",
+							"subject_CN": "Subject CN"
+						}
+					}
+				}
+			],
+			"type": "table"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"custom": {
+						"align": "auto",
+						"displayMode": "auto",
+						"filterable": false,
+						"inspect": false
+					},
+					"mappings": [],
+					"noValue": "N/A",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					}
+				},
+				"overrides": [
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Days"
+						},
+						"properties": [
+							{
+								"id": "custom.align",
+								"value": "center"
+							},
+							{
+								"id": "custom.width",
+								"value": 100
+							}
+						]
+					}
+				]
+			},
+			"gridPos": {
+				"h": 12,
+				"w": 12,
+				"x": 12,
+				"y": 28
+			},
+			"id": 32,
+			"options": {
+				"footer": {
+					"fields": "",
+					"reducer": [
+						"sum"
+					],
+					"show": false
+				},
+				"showHeader": true
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"editorMode": "code",
+					"expr": "topk(10, (x509_cert_not_after - x509_cert_not_before) / 86400)",
+					"format": "table",
+					"instant": true,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Host Paths : Longest Validity Period",
+			"transformations": [
+				{
+					"id": "filterFieldsByName",
+					"options": {
+						"include": {
+							"names": [
+								"instance",
+								"subject_CN",
+								"filepath",
+								"Value",
+								"host"
+							],
+							"pattern": "^(subject_CN|instance|filepath|Value)$"
+						}
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": {},
+						"indexByName": {
+							"Value": 4,
+							"filepath": 3,
+							"host": 2,
+							"instance": 1,
+							"subject_CN": 0
+						},
+						"renameByName": {
+							"Value": "Days",
+							"filepath": "File Path",
+							"host": "Host",
+							"instance": "Instance",
+							"subject_CN": "Subject CN"
+						}
+					}
+				}
+			],
+			"type": "table"
+		},
+		{
+			"datasource": {
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"custom": {
+						"align": "auto",
+						"displayMode": "auto",
+						"filterable": false,
+						"inspect": false
+					},
+					"mappings": [
+						{
+							"options": {
+								"None": {
+									"index": 0,
+									"text": "N/A"
+								}
+							},
+							"type": "value"
+						}
+					],
+					"noValue": "N/A",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					}
+				},
+				"overrides": [
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Certificate Count"
+						},
+						"properties": [
+							{
+								"id": "custom.align",
+								"value": "center"
+							},
+							{
+								"id": "custom.width",
+								"value": 150
+							}
+						]
+					}
+				]
+			},
+			"gridPos": {
+				"h": 12,
+				"w": 12,
+				"x": 0,
+				"y": 40
+			},
+			"id": 14,
+			"options": {
+				"footer": {
+					"fields": "",
+					"reducer": [
+						"sum"
+					],
+					"show": false
+				},
+				"showHeader": true
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"expr": "topk(10, sort_desc(count by (issuer_CN) (x509_cert_not_after)))",
+					"format": "table",
+					"instant": true,
+					"interval": "",
+					"intervalFactor": 1,
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Top Issuers",
+			"transformations": [
+				{
+					"id": "filterFieldsByName",
+					"options": {
+						"include": {
+							"names": [
+								"issuer_CN",
+								"Value"
+							]
+						}
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": {},
+						"indexByName": {},
+						"renameByName": {
+							"Value": "Certificate Count",
+							"issuer_CN": "Issuer CN"
+						}
+					}
+				}
+			],
+			"type": "table"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"custom": {
+						"align": "auto",
+						"displayMode": "auto",
+						"filterable": false,
+						"inspect": false
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					}
+				},
+				"overrides": [
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Certificate Count"
+						},
+						"properties": [
+							{
+								"id": "custom.align",
+								"value": "center"
+							},
+							{
+								"id": "custom.width",
+								"value": 150
+							}
+						]
+					}
+				]
+			},
+			"gridPos": {
+				"h": 12,
+				"w": 12,
+				"x": 12,
+				"y": 40
+			},
+			"id": 16,
+			"options": {
+				"footer": {
+					"fields": "",
+					"reducer": [
+						"sum"
+					],
+					"show": false
+				},
+				"showHeader": true
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"editorMode": "code",
+					"expr": "topk(10, sort_desc(count by (instance) (x509_cert_not_after)))",
+					"format": "table",
+					"instant": true,
+					"interval": "",
+					"intervalFactor": 1,
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Top Instances (Host Paths)",
+			"transformations": [
+				{
+					"id": "filterFieldsByName",
+					"options": {
+						"include": {
+							"names": [
+								"Value",
+								"instance"
+							]
+						}
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": {},
+						"indexByName": {},
+						"renameByName": {
+							"Value": "Certificate Count",
+							"instance": "Instance"
+						}
+					}
+				}
+			],
+			"type": "table"
+		},
+		{
+			"collapsed": false,
+			"datasource": {
+				"type": "prometheus",
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"gridPos": {
+				"h": 1,
+				"w": 24,
+				"x": 0,
+				"y": 52
+			},
+			"id": 35,
+			"panels": [],
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"refId": "A"
+				}
+			],
+			"title": "Exporters",
+			"type": "row"
+		},
+		{
+			"datasource": {
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"axisCenteredZero": false,
+						"axisColorMode": "text",
+						"axisLabel": "",
+						"axisPlacement": "auto",
+						"barAlignment": 0,
+						"drawStyle": "line",
+						"fillOpacity": 10,
+						"gradientMode": "none",
+						"hideFrom": {
+							"legend": false,
+							"tooltip": false,
+							"viz": false
+						},
+						"lineInterpolation": "linear",
+						"lineWidth": 1,
+						"pointSize": 5,
+						"scaleDistribution": {
+							"type": "linear"
+						},
+						"showPoints": "never",
+						"spanNulls": false,
+						"stacking": {
+							"group": "A",
+							"mode": "none"
+						},
+						"thresholdsStyle": {
+							"mode": "off"
+						}
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					},
+					"unit": "short"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 8,
+				"w": 12,
+				"x": 0,
+				"y": 53
+			},
+			"id": 38,
+			"options": {
+				"legend": {
+					"calcs": [
+						"lastNotNull",
+						"max",
+						"min"
+					],
+					"displayMode": "table",
+					"placement": "bottom",
+					"showLegend": true
+				},
+				"tooltip": {
+					"mode": "multi",
+					"sort": "none"
+				}
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"expr": "count(x509_read_errors)",
+					"interval": "",
+					"legendFormat": "exporters",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Reporting Exporters",
+			"type": "timeseries"
+		},
+		{
+			"datasource": {
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"axisCenteredZero": false,
+						"axisColorMode": "text",
+						"axisLabel": "",
+						"axisPlacement": "auto",
+						"barAlignment": 0,
+						"drawStyle": "line",
+						"fillOpacity": 10,
+						"gradientMode": "none",
+						"hideFrom": {
+							"legend": false,
+							"tooltip": false,
+							"viz": false
+						},
+						"lineInterpolation": "linear",
+						"lineWidth": 1,
+						"pointSize": 5,
+						"scaleDistribution": {
+							"type": "linear"
+						},
+						"showPoints": "never",
+						"spanNulls": false,
+						"stacking": {
+							"group": "A",
+							"mode": "none"
+						},
+						"thresholdsStyle": {
+							"mode": "off"
+						}
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					},
+					"unit": "short"
+				},
+				"overrides": [
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "exporters with errors"
+						},
+						"properties": [
+							{
+								"id": "color",
+								"value": {
+									"fixedColor": "red",
+									"mode": "fixed"
+								}
+							}
+						]
+					}
+				]
+			},
+			"gridPos": {
+				"h": 8,
+				"w": 12,
+				"x": 12,
+				"y": 53
+			},
+			"id": 39,
+			"options": {
+				"legend": {
+					"calcs": [
+						"lastNotNull",
+						"max",
+						"min"
+					],
+					"displayMode": "table",
+					"placement": "bottom",
+					"showLegend": true
+				},
+				"tooltip": {
+					"mode": "multi",
+					"sort": "none"
+				}
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"expr": "sum (x509_read_errors > bool 0)",
+					"interval": "",
+					"legendFormat": "exporters with errors",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Exporters with Errors",
+			"type": "timeseries"
+		},
+		{
+			"datasource": {
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"axisCenteredZero": false,
+						"axisColorMode": "text",
+						"axisLabel": "",
+						"axisPlacement": "auto",
+						"barAlignment": 0,
+						"drawStyle": "line",
+						"fillOpacity": 10,
+						"gradientMode": "none",
+						"hideFrom": {
+							"legend": false,
+							"tooltip": false,
+							"viz": false
+						},
+						"lineInterpolation": "linear",
+						"lineWidth": 1,
+						"pointSize": 5,
+						"scaleDistribution": {
+							"type": "linear"
+						},
+						"showPoints": "never",
+						"spanNulls": false,
+						"stacking": {
+							"group": "A",
+							"mode": "none"
+						},
+						"thresholdsStyle": {
+							"mode": "off"
+						}
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					},
+					"unit": "cps"
+				},
+				"overrides": [
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "error rate"
+						},
+						"properties": [
+							{
+								"id": "color",
+								"value": {
+									"fixedColor": "red",
+									"mode": "fixed"
+								}
+							}
+						]
+					},
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "errors"
+						},
+						"properties": [
+							{
+								"id": "color",
+								"value": {
+									"fixedColor": "red",
+									"mode": "fixed"
+								}
+							}
+						]
+					}
+				]
+			},
+			"gridPos": {
+				"h": 8,
+				"w": 12,
+				"x": 0,
+				"y": 61
+			},
+			"id": 41,
+			"options": {
+				"legend": {
+					"calcs": [
+						"lastNotNull",
+						"max",
+						"min"
+					],
+					"displayMode": "table",
+					"placement": "bottom",
+					"showLegend": true
+				},
+				"tooltip": {
+					"mode": "multi",
+					"sort": "none"
+				}
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"expr": "sum(rate(x509_read_errors[15m]))",
+					"interval": "",
+					"legendFormat": "error rate",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Error Rate",
+			"type": "timeseries"
+		},
+		{
+			"datasource": {
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"axisCenteredZero": false,
+						"axisColorMode": "text",
+						"axisLabel": "",
+						"axisPlacement": "auto",
+						"barAlignment": 0,
+						"drawStyle": "line",
+						"fillOpacity": 10,
+						"gradientMode": "none",
+						"hideFrom": {
+							"legend": false,
+							"tooltip": false,
+							"viz": false
+						},
+						"lineInterpolation": "linear",
+						"lineWidth": 1,
+						"pointSize": 5,
+						"scaleDistribution": {
+							"type": "linear"
+						},
+						"showPoints": "never",
+						"spanNulls": false,
+						"stacking": {
+							"group": "A",
+							"mode": "none"
+						},
+						"thresholdsStyle": {
+							"mode": "off"
+						}
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					},
+					"unit": "short"
+				},
+				"overrides": [
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "errors"
+						},
+						"properties": [
+							{
+								"id": "color",
+								"value": {
+									"fixedColor": "red",
+									"mode": "fixed"
+								}
+							}
+						]
+					}
+				]
+			},
+			"gridPos": {
+				"h": 8,
+				"w": 12,
+				"x": 12,
+				"y": 61
+			},
+			"id": 40,
+			"options": {
+				"legend": {
+					"calcs": [
+						"lastNotNull",
+						"max",
+						"min"
+					],
+					"displayMode": "table",
+					"placement": "bottom",
+					"showLegend": true
+				},
+				"tooltip": {
+					"mode": "multi",
+					"sort": "none"
+				}
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"expr": "sum(x509_read_errors)",
+					"interval": "",
+					"legendFormat": "errors",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Cumulative Errors",
+			"type": "timeseries"
+		},
+		{
+			"datasource": {
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"custom": {
+						"align": "auto",
+						"displayMode": "auto",
+						"filterable": false,
+						"inspect": false
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 1
+							}
+						]
+					}
+				},
+				"overrides": [
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Rate"
+						},
+						"properties": [
+							{
+								"id": "custom.width",
+								"value": 150
+							},
+							{
+								"id": "custom.align",
+								"value": "center"
+							},
+							{
+								"id": "custom.displayMode",
+								"value": "color-background-solid"
+							}
+						]
+					}
+				]
+			},
+			"gridPos": {
+				"h": 12,
+				"w": 12,
+				"x": 0,
+				"y": 69
+			},
+			"id": 43,
+			"options": {
+				"footer": {
+					"fields": "",
+					"reducer": [
+						"sum"
+					],
+					"show": false
+				},
+				"showHeader": true
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"expr": "topk(10, rate(x509_read_errors[6h]))",
+					"format": "table",
+					"instant": true,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Top Exporters by Error Rate",
+			"transformations": [
+				{
+					"id": "filterFieldsByName",
+					"options": {
+						"include": {
+							"pattern": "^(instance|Value)$"
+						}
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": {},
+						"indexByName": {},
+						"renameByName": {
+							"Value": "Rate",
+							"instance": "Instance"
+						}
+					}
+				}
+			],
+			"type": "table"
+		},
+		{
+			"datasource": {
+				"uid": "${DS_PROMETHEUS}"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"custom": {
+						"align": "auto",
+						"displayMode": "auto",
+						"filterable": false,
+						"inspect": false
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 1
+							}
+						]
+					}
+				},
+				"overrides": [
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Errors"
+						},
+						"properties": [
+							{
+								"id": "custom.width",
+								"value": 150
+							},
+							{
+								"id": "custom.align",
+								"value": "center"
+							},
+							{
+								"id": "custom.displayMode",
+								"value": "color-background-solid"
+							}
+						]
+					}
+				]
+			},
+			"gridPos": {
+				"h": 12,
+				"w": 12,
+				"x": 12,
+				"y": 69
+			},
+			"id": 44,
+			"options": {
+				"footer": {
+					"fields": "",
+					"reducer": [
+						"sum"
+					],
+					"show": false
+				},
+				"showHeader": true
+			},
+			"pluginVersion": "9.1.6",
+			"targets": [
+				{
+					"datasource": {
+						"uid": "${DS_PROMETHEUS}"
+					},
+					"expr": "topk(10, x509_read_errors)",
+					"format": "table",
+					"instant": true,
+					"interval": "",
+					"legendFormat": "",
+					"queryType": "randomWalk",
+					"refId": "A"
+				}
+			],
+			"title": "Top Exporters by Cumulative Errors",
+			"transformations": [
+				{
+					"id": "filterFieldsByName",
+					"options": {
+						"include": {
+							"pattern": "^(instance|Value)$"
+						}
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": {},
+						"indexByName": {},
+						"renameByName": {
+							"Value": "Errors",
+							"instance": "Instance"
+						}
+					}
+				}
+			],
+			"type": "table"
+		}
+	],
+	"refresh": false,
+	"schemaVersion": 37,
+	"style": "dark",
+	"tags": [],
+	"templating": {
+		"list": [
+			{
+				"current": {
+					"selected": false,
+					"text": "Prometheus",
+					"value": "Prometheus"
+				},
+				"hide": 0,
+				"includeAll": false,
+				"label": "Datasource",
+				"multi": false,
+				"name": "DS_PROMETHEUS",
+				"options": [],
+				"query": "prometheus",
+				"queryValue": "",
+				"refresh": 1,
+				"regex": "",
+				"skipUrlSync": false,
+				"type": "datasource"
+			},
+			{
+				"current": {
+					"selected": false,
+					"text": "7",
+					"value": "7"
+				},
+				"hide": 0,
+				"includeAll": false,
+				"label": "Critical Threshold (days)",
+				"multi": false,
+				"name": "critical_threshold",
+				"options": [
+					{
+						"selected": false,
+						"text": "1",
+						"value": "1"
+					},
+					{
+						"selected": true,
+						"text": "7",
+						"value": "7"
+					},
+					{
+						"selected": false,
+						"text": "14",
+						"value": "14"
+					},
+					{
+						"selected": false,
+						"text": "15",
+						"value": "15"
+					},
+					{
+						"selected": false,
+						"text": "28",
+						"value": "28"
+					},
+					{
+						"selected": false,
+						"text": "30",
+						"value": "30"
+					},
+					{
+						"selected": false,
+						"text": "60",
+						"value": "60"
+					},
+					{
+						"selected": false,
+						"text": "90",
+						"value": "90"
+					},
+					{
+						"selected": false,
+						"text": "180",
+						"value": "180"
+					},
+					{
+						"selected": false,
+						"text": "365",
+						"value": "365"
+					}
+				],
+				"query": "1,7,14,15,28,30,60,90,180,365",
+				"queryValue": "",
+				"skipUrlSync": false,
+				"type": "custom"
+			},
+			{
+				"current": {
+					"selected": false,
+					"text": "28",
+					"value": "28"
+				},
+				"hide": 0,
+				"includeAll": false,
+				"label": "Warning Threshold (days)",
+				"multi": false,
+				"name": "warning_threshold",
+				"options": [
+					{
+						"selected": false,
+						"text": "1",
+						"value": "1"
+					},
+					{
+						"selected": false,
+						"text": "7",
+						"value": "7"
+					},
+					{
+						"selected": false,
+						"text": "14",
+						"value": "14"
+					},
+					{
+						"selected": false,
+						"text": "15",
+						"value": "15"
+					},
+					{
+						"selected": true,
+						"text": "28",
+						"value": "28"
+					},
+					{
+						"selected": false,
+						"text": "30",
+						"value": "30"
+					},
+					{
+						"selected": false,
+						"text": "60",
+						"value": "60"
+					},
+					{
+						"selected": false,
+						"text": "90",
+						"value": "90"
+					},
+					{
+						"selected": false,
+						"text": "180",
+						"value": "180"
+					},
+					{
+						"selected": false,
+						"text": "365",
+						"value": "365"
+					}
+				],
+				"query": "1,7,14,15,28,30,60,90,180,365",
+				"queryValue": "",
+				"skipUrlSync": false,
+				"type": "custom"
+			},
+			{
+				"current": {
+					"selected": false,
+					"text": "3650",
+					"value": "3650"
+				},
+				"hide": 0,
+				"includeAll": false,
+				"label": "List expiring in less than (days)",
+				"multi": false,
+				"name": "list_threshold",
+				"options": [
+					{
+						"selected": false,
+						"text": "1",
+						"value": "1"
+					},
+					{
+						"selected": false,
+						"text": "7",
+						"value": "7"
+					},
+					{
+						"selected": false,
+						"text": "15",
+						"value": "15"
+					},
+					{
+						"selected": false,
+						"text": "30",
+						"value": "30"
+					},
+					{
+						"selected": false,
+						"text": "60",
+						"value": "60"
+					},
+					{
+						"selected": false,
+						"text": "90",
+						"value": "90"
+					},
+					{
+						"selected": false,
+						"text": "180",
+						"value": "180"
+					},
+					{
+						"selected": false,
+						"text": "365",
+						"value": "365"
+					},
+					{
+						"selected": false,
+						"text": "730",
+						"value": "730"
+					},
+					{
+						"selected": false,
+						"text": "1095",
+						"value": "1095"
+					},
+					{
+						"selected": false,
+						"text": "1460",
+						"value": "1460"
+					},
+					{
+						"selected": false,
+						"text": "1825",
+						"value": "1825"
+					},
+					{
+						"selected": true,
+						"text": "3650",
+						"value": "3650"
+					},
+					{
+						"selected": false,
+						"text": "7300",
+						"value": "7300"
+					}
+				],
+				"query": "1,7,15,30,60,90,180,365,730,1095,1460,1825,3650,7300",
+				"queryValue": "",
+				"skipUrlSync": false,
+				"type": "custom"
+			}
+		]
+	},
+	"time": {
+		"from": "now-6h",
+		"to": "now"
+	},
+	"timepicker": {},
+	"timezone": "",
+	"title": "Certificates Expiration (X509 Certificate Exporter)",
+	"uid": "lHnsYlPGk",
+	"version": 18,
+	"weekStart": ""
+}
