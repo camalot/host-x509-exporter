@@ -49,16 +49,21 @@ hosts:
   port: 8443
 - name: server3.home.local
   port: 10000
+# add labels to the metric
+labels:
+- name: "my-label"
+  value: "foo-bar"
 ```
 
 ## ENVIRONMENT VARIABLES
 
 You can set all the configuration via environment variables, if needed.
 
-- `X509_CONFIG_FILE`: Path to the config file to load
-- `X509_CONFIG_METRICS_PORT`: port to listen on for exporting
-- `X509_CONFIG_METRICS_POLLING_INTERVAL`: how often to poll the certificates
+- `X509_CONFIG_FILE`: Path to the config file to load `default: /app/config/.configuration.yaml`
+- `X509_CONFIG_METRICS_PORT`: port to listen on for exporting. `default: 8932`
+- `X509_CONFIG_METRICS_POLLING_INTERVAL`: how often to poll the certificates. `default: 43200`
 - `X509_CONFIG_HOST_<NUMBER>`: Host and port to check. `X509_CONFIG_HOST_1=server1.home.local:443`
+- `X509_CONFIG_LABEL_<NAME>`: Add custom labels and values to the metrics. `<NAME>` must match `([A-Z0-9_-]+)`. The label will be lowercase in the metric. All labels will be added to all host metrics. 
 
 If you only want to configure via environment variables, then set `X509_CONFIG_FILE` to a non-existent file. `/app/config/null.yaml`. 
 
@@ -74,6 +79,7 @@ docker run --rm \
 	-e X509_CONFIG_METRICS_POLLING_INTERVAL=43200 \
 	-e X509_CONFIG_HOST_1=host1.home.local:443 \
 	-e X509_CONFIG_HOST_2=host2.home.local:443 \
+	-e X509_CONFIG_LABEL_ENV=dev \
 	-v /mnt/container_data/host-x509-certificate-exporter/config:/app/config \
 	--restart=unless-stopped \
 	ghcr.io/camalot/host-x509-certificate-exporter:latest
@@ -99,6 +105,7 @@ services:
       X509_CONFIG_METRICS_POLLING_INTERVAL: "43200"
       X509_CONFIG_HOST_1: host1.home.local:443
       X509_CONFIG_HOST_2: host2.home.local:443
+      X509_CONFIG_LABEL_ENV: dev
 ```
 
 # PROMETHEUS ALERTS

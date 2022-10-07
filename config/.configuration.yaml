@@ -8,3 +8,4 @@ hosts: []
 #   port: 8443
 # - name: server3.home.local
 #   port: 10000
+labels: []
