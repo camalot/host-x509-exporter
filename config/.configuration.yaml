@@ -1,10 +1,10 @@
 metrics:
   port: 8932
   pollingInterval: 43200 # 12 hours
-hosts:
-- name: server1.home.local
-  port: 443
-- name: server2.home.local
-  port: 8443
-- name: server3.home.local
-  port: 10000
+hosts: []
+# - name: server1.home.local
+#   port: 443
+# - name: server2.home.local
+#   port: 8443
+# - name: server3.home.local
+#   port: 10000

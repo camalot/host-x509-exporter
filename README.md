@@ -29,6 +29,8 @@ The following metrics are available:
 
 # CONFIGURATION
 
+## CONFIG FILE
+
 By default, it will load `/app/config/.configuration.yaml`. To change this, set the `X509_CONFIG_FILE` environment variable.
 
 ```yaml
@@ -56,9 +58,11 @@ You can set all the configuration via environment variables, if needed.
 - `X509_CONFIG_METRICS_POLLING_INTERVAL`: how often to poll the certificates
 - `X509_CONFIG_HOST_<NUMBER>`: Host and port to check. `X509_CONFIG_HOST_1=server1.home.local:443`
 
+If you only want to configure via environment variables, then set `X509_CONFIG_FILE` to a non-existent file. `/app/config/null.yaml`. 
+
 # USAGE
 
-### DOCKER
+## DOCKER
 
 ```
 docker run --rm \
@@ -72,7 +76,7 @@ docker run --rm \
 	--restart=unless-stopped \
 	ghcr.io/camalot/host-x509-certificate-exporter:latest
 ```
-### DOCKER COMPOSE
+## DOCKER COMPOSE
 
 ```yaml
 version: '3.7'
