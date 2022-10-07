@@ -58,6 +58,8 @@ You can set all the configuration via environment variables, if needed.
 - `X509_CONFIG_METRICS_POLLING_INTERVAL`: how often to poll the certificates
 - `X509_CONFIG_HOST_<NUMBER>`: Host and port to check. `X509_CONFIG_HOST_1=server1.home.local:443`
 
+If you only want to configure via environment variables, then set `X509_CONFIG_FILE` to a non-existent file. `/app/config/null.yaml`. 
+
 # USAGE
 
 ## DOCKER
