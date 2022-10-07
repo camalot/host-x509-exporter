@@ -1,5 +1,7 @@
 # 🔏 X.509 CERTIFICATE EXPORTER
 
+[![Host-X509-Certificate-Exporter Publish](https://github.com/camalot/host-x509-certificate-exporter/actions/workflows/publish-main.yml/badge.svg)](https://github.com/camalot/host-x509-certificate-exporter/actions/workflows/publish-main.yml) [![License](https://img.shields.io/github/license/camalot/host-x509-certificate-exporter.svg)](https://github.com/camalot/host-x509-certificate-exporter/blob/master/LICENSE) [![Version](https://badge.fury.io/gh/camalot%2Fhost-x509-certificate-exporter.svg)](https://github.com/camalot/host-x509-certificate-exporter/pkgs/container/host-x509-certificate-exporter)
+
 Inspired by [enix/x509-certificate-exporter](https://github.com/enix/x509-certificate-exporter) but added the ability to just hit a host to get the certificate info. If you want to export certs from kubernetes or from local files, see the exporter from enix. This is only if you want to get the cert from the host and port. 
 
 This uses all the same metric names. Most of the labels are the same, this just adds a `host` label.
