@@ -36,6 +36,7 @@ class AppConfig():
 			"pollingInterval": int(dict_get(os.environ, "X509_CONFIG_METRICS_POLLING_INTERVAL", "43200"))
 		}
 		self.hosts = list()
+		self.labels = list()
 
 		try:
 			# check if file exists
@@ -47,13 +48,39 @@ class AppConfig():
 		except yaml.YAMLError as exc:
 			print(exc)
 
-		env_hosts = self.find_hosts_from_envrionment()
+		env_hosts = self.find_hosts_from_environment()
 		if len(env_hosts) > 0:
 			# merge env_hosts with config file
 			self.hosts = self.hosts + env_hosts
 			print(f"Appended {len(env_hosts)} hosts from environment variables")
+		env_labels = self.find_labels_from_environment()
+		if len(env_labels) > 0:
+			# merge env_labels with config file
+			for label in env_labels:
+				# check if label already exists
+				if label['name'] not in [x['name'] for x in self.labels]:
+					print(f"adding label {label['name']} from environment variables")
+					self.labels.append(label)
+			print(f"Appended {len(env_labels)} labels from environment variables")
+			
+	def find_labels_from_environment(self):
+		labels = list()
+		for env in os.environ:
+			pattern = r"^X509_CONFIG_LABEL_([A-Z0-9_-]+)$"
+			if re.match(pattern, env, re.IGNORECASE | re.DOTALL):
+				print(f"Found Label from Environment Variable: {env}")
+				# get the capture group
+				label = re.search(pattern, env, re.IGNORECASE | re.DOTALL).group(1)
+				# get the value
+				value = os.environ[env]
+				# add to labels
+				labels.append({
+					"name": label.lower(),
+					"value": value
+				})
+		return labels
 
-	def find_hosts_from_envrionment(self):
+	def find_hosts_from_environment(self):
 		hosts = []
 		for env in os.environ:
 			if re.match(r"^X509_CONFIG_HOST_\d{1,}$", env, re.IGNORECASE | re.DOTALL):
@@ -90,6 +117,9 @@ class X509Metrics:
 				"subject_CN",
 				"subject_ST"
 			]
+			# merge labels and config labels
+			labels = labels + [x['name'] for x in self.config.labels]
+
 			self.not_valid_after = Gauge(namespace=self.namespace, name=f"cert_not_after", documentation="The timestamp of when the certificate will expire", labelnames=labels)
 			self.not_valid_before = Gauge(namespace=self.namespace, name=f"cert_not_before", documentation="The timestamp of when the certificate was issued", labelnames=labels)
 			# if expired, set to 1, else 0
@@ -147,6 +177,11 @@ class X509Metrics:
 					"subject_CN": self.get_oid_attribute(subject, x509.oid.NameOID.COMMON_NAME),
 					"subject_ST": self.get_oid_attribute(subject, x509.oid.NameOID.STATE_OR_PROVINCE_NAME)
 				}
+
+				# add custom labels
+				for label in self.config.labels:
+					if label['name'] not in labels:
+						labels[label['name']] = label['value']
 				# set metrics
 				self.not_valid_after.labels(**labels).set(expiration_date.timestamp())
 				self.not_valid_before.labels(**labels).set(issued_date.timestamp())
