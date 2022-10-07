@@ -575,6 +575,7 @@
 						"inspect": false
 					},
 					"mappings": [],
+					"noValue": "N/A",
 					"thresholds": {
 						"mode": "absolute",
 						"steps": [
@@ -2015,7 +2016,7 @@
 		"list": [
 			{
 				"current": {
-					"selected": true,
+					"selected": false,
 					"text": "Prometheus",
 					"value": "Prometheus"
 				},
@@ -2266,6 +2267,6 @@
 	"timezone": "",
 	"title": "Certificates Expiration (X509 Certificate Exporter)",
 	"uid": "lHnsYlPGk",
-	"version": 20,
+	"version": 21,
 	"weekStart": ""
 }

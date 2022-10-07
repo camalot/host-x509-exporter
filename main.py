@@ -35,6 +35,8 @@ class AppConfig():
 			"port": int(dict_get(os.environ, "X509_CONFIG_METRICS_PORT", "8932")),
 			"pollingInterval": int(dict_get(os.environ, "X509_CONFIG_METRICS_POLLING_INTERVAL", "43200"))
 		}
+		self.hosts = list()
+
 		try:
 			# check if file exists
 			if os.path.exists(file):
@@ -44,6 +46,7 @@ class AppConfig():
 					self.__dict__.update(settings)
 		except yaml.YAMLError as exc:
 			print(exc)
+
 		env_hosts = self.find_hosts_from_envrionment()
 		if len(env_hosts) > 0:
 			# merge env_hosts with config file
@@ -127,76 +130,32 @@ class X509Metrics:
 				serial = x509_cert.serial_number
 				issuer = x509_cert.issuer
 				subject = x509_cert.subject
-				# set prometheus metric
-				issuer_C = self.get_oid_attribute(issuer, x509.oid.NameOID.COUNTRY_NAME)
-				issuer_L = self.get_oid_attribute(issuer, x509.oid.NameOID.LOCALITY_NAME)
-				issuer_O = self.get_oid_attribute(issuer, x509.oid.NameOID.ORGANIZATION_NAME)
-				issuer_OU = self.get_oid_attribute(issuer, x509.oid.NameOID.ORGANIZATIONAL_UNIT_NAME)
-				issuer_ST = self.get_oid_attribute(issuer, x509.oid.NameOID.STATE_OR_PROVINCE_NAME)
-				issuer_CN = self.get_oid_attribute(issuer, x509.oid.NameOID.COMMON_NAME)
-
-				subject_C = self.get_oid_attribute(subject, x509.oid.NameOID.COUNTRY_NAME)
-				subject_L = self.get_oid_attribute(subject, x509.oid.NameOID.LOCALITY_NAME)
-				subject_O = self.get_oid_attribute(subject, x509.oid.NameOID.ORGANIZATION_NAME)
-				subject_OU = self.get_oid_attribute(subject, x509.oid.NameOID.ORGANIZATIONAL_UNIT_NAME)
-				subject_ST = self.get_oid_attribute(subject, x509.oid.NameOID.STATE_OR_PROVINCE_NAME)
-				subject_CN = self.get_oid_attribute(subject, x509.oid.NameOID.COMMON_NAME)
-
-				self.not_valid_after.labels(
-					host=f"{host['name']}:{host['port']}",
-					issuer_C=issuer_C,
-					issuer_L=issuer_L,
-					issuer_O=issuer_O,
-					issuer_OU=issuer_OU,
-					issuer_ST=issuer_ST,
-					issuer_CN=issuer_CN,
-					serial_number=serial,
-					subject_C=subject_C,
-					subject_L=subject_L,
-					subject_ST=subject_ST,
-					subject_O=subject_O,
-					subject_OU=subject_OU,
-					subject_CN=subject_CN,
-					).set(expiration_date.timestamp())
-				# set prometheus metric
-				self.not_valid_before.labels(
-					host=f"{host['name']}:{host['port']}",
-					issuer_C=issuer_C,
-					issuer_L=issuer_L,
-					issuer_O=issuer_O,
-					issuer_OU=issuer_OU,
-					issuer_ST=issuer_ST,
-					issuer_CN=issuer_CN,
-					serial_number=serial,
-					subject_C=subject_C,
-					subject_L=subject_L,
-					subject_ST=subject_ST,
-					subject_O=subject_O,
-					subject_OU=subject_OU,
-					subject_CN=subject_CN,
-					).set(issued_date.timestamp())
-				# set prometheus metric
-				self.expired.labels(
-					host=f"{host['name']}:{host['port']}",
-					issuer_C=issuer_C,
-					issuer_L=issuer_L,
-					issuer_O=issuer_O,
-					issuer_OU=issuer_OU,
-					issuer_ST=issuer_ST,
-					issuer_CN=issuer_CN,
-					serial_number=serial,
-					subject_C=subject_C,
-					subject_L=subject_L,
-					subject_ST=subject_ST,
-					subject_O=subject_O,
-					subject_OU=subject_OU,
-					subject_CN=subject_CN,
-				).set(1 if expiration_date < datetime.datetime.now().replace(tzinfo=pytz.UTC) else 0)
+				# get labels
+				labels = {
+					"host": f"{host['name']}:{host['port']}",
+					"issuer_C": self.get_oid_attribute(issuer, x509.oid.NameOID.COUNTRY_NAME),
+					"issuer_L": self.get_oid_attribute(issuer, x509.oid.NameOID.LOCALITY_NAME),
+					"issuer_O": self.get_oid_attribute(issuer, x509.oid.NameOID.ORGANIZATION_NAME),
+					"issuer_OU": self.get_oid_attribute(issuer, x509.oid.NameOID.ORGANIZATIONAL_UNIT_NAME),
+					"issuer_ST": self.get_oid_attribute(issuer, x509.oid.NameOID.STATE_OR_PROVINCE_NAME),
+					"issuer_CN": self.get_oid_attribute(issuer, x509.oid.NameOID.COMMON_NAME),
+					"serial_number": serial,
+					"subject_C": self.get_oid_attribute(subject, x509.oid.NameOID.COUNTRY_NAME),
+					"subject_L": self.get_oid_attribute(subject, x509.oid.NameOID.LOCALITY_NAME),
+					"subject_O": self.get_oid_attribute(subject, x509.oid.NameOID.ORGANIZATION_NAME),
+					"subject_OU": self.get_oid_attribute(subject, x509.oid.NameOID.ORGANIZATIONAL_UNIT_NAME),
+					"subject_CN": self.get_oid_attribute(subject, x509.oid.NameOID.COMMON_NAME),
+					"subject_ST": self.get_oid_attribute(subject, x509.oid.NameOID.STATE_OR_PROVINCE_NAME)
+				}
+				# set metrics
+				self.not_valid_after.labels(**labels).set(expiration_date.timestamp())
+				self.not_valid_before.labels(**labels).set(issued_date.timestamp())
+				self.expired.labels(**labels).set(int(expiration_date < datetime.datetime.now(pytz.UTC)))
+				self.host_read_errors.labels(host=f"{host['name']}:{host['port']}").set(0)
 			except Exception as e:
 				error_count += 1
 				self.host_read_errors.labels(host=f"{host['name']}:{host['port']}").set(1)
-			if error_count == 0:
-				self.host_read_errors.labels(host=f"{host['name']}:{host['port']}").set(0)
+
 
 		self.read_errors.set(error_count)
 def dict_get(dictionary, key, default_value = None):
