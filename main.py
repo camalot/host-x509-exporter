@@ -201,7 +201,7 @@ def dict_get(dictionary, key, default_value = None):
 		return default_value
 
 def sighandler(signum, frame):
-	print "<SIGTERM received>"
+	print("<SIGTERM received>")
 	exit(0)
 
 def main():
