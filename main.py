@@ -17,6 +17,7 @@
 from cryptography import x509
 from prometheus_client import start_http_server, Gauge, Enum
 import codecs
+import signal
 import ssl
 import pytz
 import yaml
@@ -62,7 +63,7 @@ class AppConfig():
 					print(f"adding label {label['name']} from environment variables")
 					self.labels.append(label)
 			print(f"Appended {len(env_labels)} labels from environment variables")
-			
+
 	def find_labels_from_environment(self):
 		labels = list()
 		for env in os.environ:
@@ -199,16 +200,24 @@ def dict_get(dictionary, key, default_value = None):
 	else:
 		return default_value
 
+def sighandler(signum, frame):
+	print "<SIGTERM received>"
+	exit(0)
+
 def main():
-	config_file = dict_get(os.environ, "X509_CONFIG_FILE", default_value="./config/.configuration.yaml")
+	signal.signal(signal.SIGTERM, sighandler)
 
-	config = AppConfig(config_file)
+	try:
+		config_file = dict_get(os.environ, "X509_CONFIG_FILE", default_value="./config/.configuration.yaml")
 
-	print(f"start listening on :{config.metrics['port']}")
+		config = AppConfig(config_file)
 
-	app_metrics = X509Metrics(config)
-	start_http_server(config.metrics['port'])
-	app_metrics.run_metrics_loop()
+		print(f"start listening on :{config.metrics['port']}")
+		app_metrics = X509Metrics(config)
+		start_http_server(config.metrics['port'])
+		app_metrics.run_metrics_loop()
+	except KeyboardInterrupt:
+		exit(0)
 
 if __name__ == "__main__":
 	main()
