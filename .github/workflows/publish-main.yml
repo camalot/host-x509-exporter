@@ -3,6 +3,13 @@ on:
   push:
     branches:
       - develop
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - 'CHANGELOG.md'
+      - 'CODE_OF_CONDUCT.md'
+      - 'CONTRIBUTING.md'
+
 jobs:
   version:
     runs-on: ubuntu-latest

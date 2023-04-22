@@ -114,7 +114,9 @@ services:
 rules:
 - alert: X509ExporterReadErrors
   annotations:
-    description: Over the last 15 minutes, this host-x509-certificate-exporter instance has experienced errors reading certificate files or querying the Kubernetes API. This could be caused by a misconfiguration if triggered when the exporter starts.
+    description: Over the last 15 minutes, this x509-exporter instance
+      has experienced errors reading certificate. This could be caused by a misconfiguration if triggered when the exporter
+      starts.
     summary: Increasing read errors for host-x509-certificate-exporter
   expr: delta(x509_read_errors[15m]) > 0
   for: 5m
@@ -124,8 +126,8 @@ rules:
   annotations:
     description: | 
       Certificate for "{{ $labels.subject_CN }}" should be renewed
-      {{if $labels.secret_name }}in Kubernets secret "{{ $labels.secret_namespace
-      }}/{{ $labels.secret_name }}"{{else}}at location "{{ $labels.filepath }}"{{end}}
+      {{if $labels.secret_name }}in Kubernetes secret "{{ $labels.secret_namespace
+      }}/{{ $labels.secret_name }}"{{else if $labels.host}}at endpoint "{{ $labels.host}}"{{else}}at location "{{ $labels.filepath }}"{{end}}
     summary: Certificate should be renewed
   expr: ((x509_cert_not_after - time()) / 86400) < 28
   for: 15m
@@ -135,8 +137,8 @@ rules:
   annotations:
     description: |
       Certificate for "{{ $labels.subject_CN }}" is about to expire
-      {{if $labels.secret_name }}in Kubernets secret "{{ $labels.secret_namespace
-      }}/{{ $labels.secret_name }}"{{else}}at location "{{ $labels.filepath }}"{{end}}
+      {{if $labels.secret_name }}in Kubernetes secret "{{ $labels.secret_namespace
+      }}/{{ $labels.secret_name }}"{{else if $labels.host}}at endpoint "{{ $labels.host}}"{{else}}at location "{{ $labels.filepath }}"{{end}}
     summary: Certificate is about to expire
   expr: ((x509_cert_not_after - time()) / 86400) < 14
   for: 15m
