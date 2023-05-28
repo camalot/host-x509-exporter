@@ -44,12 +44,12 @@ jobs:
       run: |
         GHCR_IMAGE="ghcr.io/${{ github.repository }}";
         DOCKER_IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/host-x509-certificate-exporter"
-        TAGS="${DOCKER_IMAGE}:latest,${DOCKER_IMAGE}:${{ needs.version.outputs.app_version }},${GHCR_IMAGE}:latest,${GHCR_IMAGE}:${{ needs.version.outputs.app_version }}";
-        BUILD_DATE="$(date +'%Y-%m-%dT%TZ%z' -u)";
-        PROJECT_NAME=`echo "${{ github.repository }}" | awk '{split($0,a,"/"); print a[2]}'`;
-        echo ::set-output name=tags::${TAGS}
-        echo ::set-output name=build_date::${BUILD_DATE}
-        echo ::set-output name=project::${PROJECT_NAME}
+        TAGSZ="${DOCKER_IMAGE}:latest,${DOCKER_IMAGE}:${{ needs.version.outputs.app_version }},${GHCR_IMAGE}:latest,${GHCR_IMAGE}:${{ needs.version.outputs.app_version }}";
+        BUILD_DATEZ="$(date +'%Y-%m-%dT%TZ%z' -u)";
+        PROJECT_NAMEZ=`echo "${{ github.repository }}" | awk '{split($0,a,"/"); print a[2]}'`;
+        echo BUILD_TAGS=${TAGSZ} >> $GITHUB_ENV;
+        echo BUILD_DATE=${BUILD_DATEZ} >> $GITHUB_ENV;
+        echo PROJECT_NAME=${PROJECT_NAMEZ} >> $GITHUB_ENV;
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
@@ -76,12 +76,12 @@ jobs:
       with:
         push: true
         build-args: |
-          PROJECT_NAME=steps.prep.outputs.project
+          PROJECT_NAME="${{ env.PROJECT_NAME }}"
           BUILD_VERSION=${{ needs.version.outputs.app_version }}
           BUILD_REF=${{ github.ref }}
           BUILD_SHA=${{ github.sha }}
-          BUILD_DATE=${{ steps.prep.outputs.build_date }}
-        tags: ${{ steps.prep.outputs.tags }}
+          BUILD_DATE=${{ env.BUILD_DATE }}
+        tags: ${{ env.BUILD_TAGS }}
   merge:
     runs-on: ubuntu-latest
     needs:
